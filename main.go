@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/AndriyZaec/pokedexcli/internal/api"
 )
 
 func supportedCommands() map[string]cliCommand {
@@ -19,11 +21,30 @@ func supportedCommands() map[string]cliCommand {
 			description: "Displays a help message",
 			callback:    commandHelp,
 		},
+		"map": {
+			name:        "map",
+			description: "List location areas",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "List previous location areas",
+			callback:    commandMapB,
+		},
 	}
 }
 
 func main() {
+	client, err := api.NewClient("https://pokeapi.co")
+	if err != nil {
+		fmt.Println("Network connection error")
+	}
+	cfg := &config{
+		Client: client,
+	}
+
 	scanner := bufio.NewScanner(os.Stdin)
+
 	for {
 		fmt.Print("Pokedex > ")
 		if !scanner.Scan() {
@@ -40,8 +61,8 @@ func main() {
 			continue
 		}
 
-		err := cmd.callback()
-		if err != nil {
+		cmdErr := cmd.callback(cfg)
+		if cmdErr != nil {
 			fmt.Println("Error:", err)
 		}
 	}
