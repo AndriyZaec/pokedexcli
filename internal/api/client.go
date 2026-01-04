@@ -8,11 +8,15 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
+
+	"github.com/AndriyZaec/pokedexcli/internal/pokecache"
 )
 
 type Client struct {
-	baseUrl *url.URL
+	baseURL *url.URL
 	http    *http.Client
+	cache   *pokecache.Cache
 }
 
 func NewClient(base string) (*Client, error) {
@@ -21,13 +25,23 @@ func NewClient(base string) (*Client, error) {
 		return nil, err
 	}
 
+	cache := pokecache.NewCache(2 * time.Minute)
+
 	return &Client{
-		baseUrl: u,
+		baseURL: u,
 		http:    &http.Client{},
+		cache:   cache,
 	}, nil
 }
 
 func (c *Client) getByURL(fullURL string, out any) error {
+	if cache, ok := c.cache.Get(fullURL); ok {
+		err := json.Unmarshal(cache, out)
+		if err == nil {
+			return nil
+		}
+	}
+
 	req, err := http.NewRequest(http.MethodGet, fullURL, nil)
 	if err != nil {
 		return err
@@ -46,7 +60,17 @@ func (c *Client) getByURL(fullURL string, out any) error {
 		return fmt.Errorf("api error: %s: %s", resp.Status, strings.TrimSpace(string(b)))
 	}
 
-	return json.NewDecoder(resp.Body).Decode(out)
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	c.cache.Add(fullURL, b)
+
+	if err := json.Unmarshal(b, out); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (c *Client) get(ctx context.Context, path string, query map[string]string, out any) error {
@@ -55,7 +79,7 @@ func (c *Client) get(ctx context.Context, path string, query map[string]string, 
 		return err
 	}
 
-	u := c.baseUrl.ResolveReference(rel)
+	u := c.baseURL.ResolveReference(rel)
 
 	if len(query) > 0 {
 		q := u.Query()

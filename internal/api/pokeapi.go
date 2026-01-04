@@ -1,6 +1,9 @@
 package api
 
-const FirstLocationAreasURL = "https://pokeapi.co/api/v2/location-area?offset=0&limit=20"
+const (
+	LocationAreaURL       = "https://pokeapi.co/api/v2/location-area"
+	FirstLocationAreasURL = "https://pokeapi.co/api/v2/location-area?offset=0&limit=20"
+)
 
 func (c *Client) GetLocationAreasPageByURL(fullURL string) (*PaginatedResponse[LocationArea], error) {
 	var out PaginatedResponse[LocationArea]
