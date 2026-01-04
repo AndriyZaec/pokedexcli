@@ -31,6 +31,11 @@ func supportedCommands() map[string]cliCommand {
 			description: "List previous location areas",
 			callback:    commandMapB,
 		},
+		"explore": {
+			name:        "explore",
+			description: "Explore location",
+			callback:    commandExplore,
+		},
 	}
 }
 
@@ -61,7 +66,7 @@ func main() {
 			continue
 		}
 
-		cmdErr := cmd.callback(cfg)
+		cmdErr := cmd.callback(cfg, text[1:]...)
 		if cmdErr != nil {
 			fmt.Println("Error:", err)
 		}

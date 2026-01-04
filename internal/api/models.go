@@ -70,6 +70,6 @@ type EncounterVersionDetails struct {
 	Version          Version            `json:"version"`
 }
 type PokemonEncounters struct {
-	Pokemon                 Pokemon          `json:"pokemon"`
-	EncounterVersionDetails []VersionDetails `json:"version_details"`
+	Pokemon                 Pokemon                   `json:"pokemon"`
+	EncounterVersionDetails []EncounterVersionDetails `json:"version_details"`
 }

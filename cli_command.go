@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -16,17 +17,17 @@ type config struct {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(cfg *config) error
+	callback    func(cfg *config, args ...string) error
 }
 
-func commandExit(cfg *config) error {
+func commandExit(cfg *config, args ...string) error {
 	_ = cfg
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(cfg *config) error {
+func commandHelp(cfg *config, args ...string) error {
 	_ = cfg
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
@@ -37,7 +38,7 @@ func commandHelp(cfg *config) error {
 	return nil
 }
 
-func commandMap(cfg *config) error {
+func commandMap(cfg *config, args ...string) error {
 	urlToFetch := api.FirstLocationAreasURL
 	if cfg.Next != nil {
 		urlToFetch = *cfg.Next
@@ -57,7 +58,7 @@ func commandMap(cfg *config) error {
 	return nil
 }
 
-func commandMapB(cfg *config) error {
+func commandMapB(cfg *config, args ...string) error {
 	urlToFetch := api.FirstLocationAreasURL
 	if cfg.Previous != nil {
 		urlToFetch = *cfg.Previous
@@ -77,5 +78,28 @@ func commandMapB(cfg *config) error {
 
 	cfg.Next = resp.Next
 	cfg.Previous = resp.Previous
+	return nil
+}
+
+func commandExplore(cfg *config, args ...string) error {
+	if len(args) < 1 {
+		return errors.New("no location selected")
+	}
+
+	resp, err := cfg.Client.GetLocationInfo(args[0])
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Exploring %s...\n", resp.Location.Name)
+	if len(resp.PokemonEncounters) > 0 {
+		fmt.Println("Found Pokemon:")
+		for _, encounter := range resp.PokemonEncounters {
+			fmt.Println(" - ", encounter.Pokemon.Name)
+		}
+	} else {
+		fmt.Println("No Pokemon found :(")
+	}
+
 	return nil
 }
