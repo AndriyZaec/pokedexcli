@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/AndriyZaec/pokedexcli/internal/api"
+	pokemoncollection "github.com/AndriyZaec/pokedexcli/internal/pokemon_collection"
 )
 
 type config struct {
@@ -99,6 +100,29 @@ func commandExplore(cfg *config, args ...string) error {
 		}
 	} else {
 		fmt.Println("No Pokemon found :(")
+	}
+
+	return nil
+}
+
+func commandCatch(cfg *config, args ...string) error {
+	if len(args) < 1 {
+		return errors.New("no pokemon to catch")
+	}
+	name := args[0]
+
+	fmt.Printf("Throwing a Pokeball at %s...\n", name)
+	resp, err := cfg.Client.GetPokemon(name)
+	if err != nil {
+		return err
+	}
+
+	_, isCatched := pokemoncollection.CatchPokemon(resp)
+
+	if isCatched {
+		fmt.Printf("%s was caught!\n", name)
+	} else {
+		fmt.Printf("%s escaped!\n", name)
 	}
 
 	return nil
