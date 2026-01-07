@@ -8,19 +8,31 @@ import (
 
 var collection = map[string]api.Pokemon{}
 
-func AddPokemon(pokemon api.Pokemon) {
-	collection[pokemon.Name] = pokemon
-}
-
-func GetPokemon(name string) (api.Pokemon, bool) {
+func InspectPokemon(name string) (api.Pokemon, bool) {
 	pokemon, ok := collection[name]
 	return pokemon, ok
+}
+
+func Pokedex() []api.Pokemon {
+	pokemons := []api.Pokemon{}
+	for _, v := range collection {
+		pokemons = append(pokemons, v)
+	}
+	return pokemons
 }
 
 func CatchPokemon(pokemon *api.Pokemon) (*api.Pokemon, bool) {
 	isCatched := catchChance(pokemon.BaseExperience)
 
+	if isCatched {
+		addPokemon(*pokemon)
+	}
+
 	return pokemon, isCatched
+}
+
+func addPokemon(pokemon api.Pokemon) {
+	collection[pokemon.Name] = pokemon
 }
 
 func catchChance(baseExp int) bool {

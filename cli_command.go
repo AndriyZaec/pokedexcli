@@ -127,3 +127,39 @@ func commandCatch(cfg *config, args ...string) error {
 
 	return nil
 }
+
+func commandInspect(cfg *config, args ...string) error {
+	_ = cfg
+	if len(args) < 1 {
+		return errors.New("no pokemon name to inspect")
+	}
+
+	name := args[0]
+	inspectedPokemon, ok := pokemoncollection.InspectPokemon(name)
+	if !ok {
+		return errors.New("you have not caught that pokemon")
+	}
+
+	fmt.Println(inspectedPokemon.FormatPokemonInfo())
+
+	return nil
+}
+
+func commandPokedex(cfg *config, args ...string) error {
+	_ = cfg
+	if len(args) > 0 {
+		return errors.New("invalid arguments")
+	}
+
+	pokemons := pokemoncollection.Pokedex()
+	if len(pokemons) < 1 {
+		return errors.New("your pokedex is empty... for now")
+	}
+
+	fmt.Println("Your Pokedex:")
+	for _, p := range pokemons {
+		fmt.Println(" - ", p.Name)
+	}
+
+	return nil
+}

@@ -41,6 +41,16 @@ func supportedCommands() map[string]cliCommand {
 			description: "Catching named pokemon",
 			callback:    commandCatch,
 		},
+		"inspect": {
+			name:        "inspect",
+			description: "Inspect caught Pokemon",
+			callback:    commandInspect,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "Show all Pokemons you caught",
+			callback:    commandPokedex,
+		},
 	}
 }
 
@@ -73,7 +83,7 @@ func main() {
 
 		cmdErr := cmd.callback(cfg, text[1:]...)
 		if cmdErr != nil {
-			fmt.Println("Error:", err)
+			fmt.Println(cmdErr)
 		}
 	}
 }
