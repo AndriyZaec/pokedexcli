@@ -2,11 +2,11 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"strings"
 
 	"github.com/AndriyZaec/pokedexcli/internal/api"
+	color "github.com/fatih/color"
 )
 
 func supportedCommands() map[string]cliCommand {
@@ -55,9 +55,11 @@ func supportedCommands() map[string]cliCommand {
 }
 
 func main() {
+	errColor := color.New(color.FgRed)
+
 	client, err := api.NewClient("https://pokeapi.co")
 	if err != nil {
-		fmt.Println("Network connection error")
+		errColor.Println("Network connection error")
 	}
 	cfg := &config{
 		Client: client,
@@ -66,7 +68,7 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
-		fmt.Print("Pokedex > ")
+		color.New(color.FgYellow).Print("Pokedex > ")
 		if !scanner.Scan() {
 			break
 		}
@@ -77,13 +79,13 @@ func main() {
 
 		cmd, ok := supportedCommands()[strings.ToLower(text[0])]
 		if !ok {
-			fmt.Println("Unknown command")
+			errColor.Println("Unknown command")
 			continue
 		}
 
 		cmdErr := cmd.callback(cfg, text[1:]...)
 		if cmdErr != nil {
-			fmt.Println(cmdErr)
+			errColor.Println(cmdErr)
 		}
 	}
 }
