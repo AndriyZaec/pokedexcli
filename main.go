@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
 
@@ -55,6 +56,7 @@ func supportedCommands() map[string]cliCommand {
 }
 
 func main() {
+	printHeader()
 	errColor := color.New(color.FgRed)
 
 	client, err := api.NewClient("https://pokeapi.co")
@@ -88,4 +90,23 @@ func main() {
 			errColor.Println(cmdErr)
 		}
 	}
+}
+
+func printHeader() {
+	yellow := color.New(color.FgYellow).SprintFunc()
+	cyan := color.New(color.FgCyan).SprintFunc()
+	fmt.Print(
+		yellow(`
+██████╗  ██████╗ ██╗  ██╗███████╗██████╗ ███████╗██╗  ██╗
+██╔══██╗██╔═══██╗██║ ██╔╝██╔════╝██╔══██╗██╔════╝╚██╗██╔╝
+██████╔╝██║   ██║█████╔╝ █████╗  ██║  ██║█████╗   ╚███╔╝ 
+██╔═══╝ ██║   ██║██╔═██╗ ██╔══╝  ██║  ██║██╔══╝   ██╔██╗ 
+██║     ╚██████╔╝██║  ██╗███████╗██████╔╝███████╗██╔╝ ██╗
+╚═╝      ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═════╝ ╚══════╝╚═╝  ╚═╝
+
+Welcome to Pokedex CLI
+Type `),
+		cyan("help"),
+		yellow(" to see available commands\n"),
+	)
 }
